@@ -4,3 +4,12 @@
 https://github.com/lin-xin/vue-manage-system
 ## License
  [MIT](https://github.com/spongebody/manage-demo/blob/master/LICENSE) 
+## 使用
+### 安装
+npm install
+### 开发
+npm run dev
+
+### git相关说明
+- 拉取代码  git pull origin main
+- 上传代码  git push -u origin main
