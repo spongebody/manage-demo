@@ -10,7 +10,7 @@
         class="ms-content"
       >
         <el-form-item prop="username">
-          <el-input v-model="param.username" placeholder="username">
+          <el-input v-model="param.username" placeholder="请输入用户名，企业代码或者用户名">
             <template #prepend>
               <el-button icon="el-icon-user"></el-button>
             </template>
@@ -19,7 +19,7 @@
         <el-form-item prop="password">
           <el-input
             type="password"
-            placeholder="password"
+            placeholder="请输入密码"
             v-model="param.password"
             @keyup.enter="submitForm()"
           >
@@ -43,17 +43,16 @@
 <script>
 import { ref, reactive } from "vue";
 import { useStore } from "vuex";
+import axios from "axios";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-
 export default {
   setup() {
     const router = useRouter();
     const param = reactive({
-      username: "admin",
-      password: "123123",
+      username: "",
+      password: "",
     });
-
     const rules = {
       username: [
         {
@@ -68,27 +67,39 @@ export default {
     const submitForm = () => {
       login.value.validate((valid) => {
         if (valid) {
-          ElMessage.success("登录成功");
-          localStorage.setItem("ms_username", param.username);
-          router.push("/");
+          console.log(111);
+          console.log(param.username);
+          // axios.get("https://mobile-ms.uat.homecreditcfc.cn/mock/6173873f0155e30027287c41/example/http:/loginTest")
+          axios.post(`https://mobile-ms.uat.homecreditcfc.cn/mock/6173873f0155e30027287c41/example/http:/loginTest` ,param)
+          .then(function(response){
+            if (response.data.message === "登陆成功") {
+              ElMessage.success("登陆成功");
+              localStorage.setItem("ms_username", param.username);
+              router.push("/");
+            }else if (response.data.message === "用户不存在") {
+              ElMessage.error("该用户不存在，请检查填写信息!");
+              return false;
+            }else if (response.data.message === "密码错误"){
+              ElMessage.error("密码错误!");
+              return false;
+            }else{
+              ElMessage.error("系统出错");
+              return false;
+            }
+          });
         } else {
           ElMessage.error("请完成表单填写！");
           return false;
         }
       });
     };
-
     const toRegister = () => {
       console.log(111);
     //   localStorage.setItem("ms_username", param.username);
       router.push("/register");
-
-
     };
-
     const store = useStore();
     store.commit("clearTags");
-
     return {
       param,
       rules,
@@ -144,7 +155,6 @@ export default {
   line-height: 30px;
   color: #fff;
 }
-
 /* 新加 */
 .register {
   color: #fff;
@@ -156,13 +166,11 @@ export default {
   padding-bottom: 2px;
   transition: all 0.3s ease;
 }
-
 .register:hover {
   color: #67b1ff;
   text-decoration: none;
   border: none;
 }
-
 .register:active {
   color: #358ff0;
 }
